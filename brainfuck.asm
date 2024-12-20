@@ -11,20 +11,74 @@ section .data
 	bfmem: times 30000 db 0
 	input: db 0
 	output: db 0
+	;;assuming bfmem is cons. loaded
+	;;holds bfmem start address
+	bfmem_start: dd 0
 
 section .text
 main:
+	mov dword [bfmem_start],bfmem
 	push esi
 	mov esi, bfmem
-
-	push 10
-	push 99
-	mov ecx, 2
-	call print
+	
+	mov eax, 7
+	call mem_move
+	call mem_printDebug
 
 	pop esi
 	mov eax, 0
 	ret
+
+mem_printDebug:
+	pop edi ;storing return address in edi cuz im doing alot of stack fuckery here
+	push ecx
+	push esi
+	push edx
+	push ebx
+	push eax
+
+	mov ecx, 6 ;its always atleast 0
+
+	sub esi, bfmem_start ;;find offset
+	nop
+	add esi, 30002 ;always offset 2 
+	mov eax, esi
+
+	test esi, esi
+	jnz num_conv
+	mov edx, 48
+	push edx
+	add ecx, 1
+	jmp mem_printDebug_num_conv_end
+
+	num_conv:
+	mov edx, 0
+	mov ebx, 10
+	div ebx ;;remainder in edx, eax=eax/ebx
+	add edx, 48 ;;ascii 0
+	push edx
+	add ecx, 1
+	test eax,eax
+	jnz num_conv
+
+mem_printDebug_num_conv_end:
+	
+	push 32 ;space
+	push 120 ;x
+	push 101 ;e
+	push 100 ;d
+	push 110 ;n
+	push 105 ;i
+	call print
+
+	pop eax
+	pop ebx
+	pop edx
+	pop esi
+	pop ecx
+	push edi
+	ret
+	
 
 mem_endLoop:
 	push eax
@@ -43,7 +97,7 @@ mem_endLoop_do:
 
 mem_startLoop:
 	;;this really doesnt do anything, all logis is in end_loop
-	;;c logic checks in both but idk if thats really neccesary
+	;;c file logic checks in both but idk if thats really neccesary
 	ret
 
 mem_get:
