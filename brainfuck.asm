@@ -37,19 +37,48 @@ mem_printDebug:
 	push ebx
 	push eax
 
-	mov ecx, 6 ;its always atleast 0
+	mov ecx, 0
 
 	sub esi, bfmem_start ;;find offset
 	nop
 	add esi, 30002 ;always offset 2 
 	mov eax, esi
 
-	test esi, esi
+	push 32
+	call num_to_text	
+	push 32 ;space
+	push 120 ;x
+	push 101 ;e
+	push 100 ;d
+	push 110 ;n
+	push 105 ;i
+	add ecx, 7
+	call print
+
+	;;debug index got, now the actual info
+
+	pop eax
+	pop ebx
+	pop edx
+	pop esi
+	pop ecx
+	push edi
+	ret
+	
+
+num_to_text:
+	;;takes number in eax
+	;;breks its decimal points down into chars
+	;;pushes them onto the stack
+	;;adds amount of char pushed to ecx
+	pop esi ;;store return in esi
+
+	test eax, eax
 	jnz num_conv
-	mov edx, 48
+	mov edx, 48 ;;this is incase index is 0
 	push edx
 	add ecx, 1
-	jmp mem_printDebug_num_conv_end
+	jmp num_to_text_end
 
 	num_conv:
 	mov edx, 0
@@ -60,25 +89,9 @@ mem_printDebug:
 	add ecx, 1
 	test eax,eax
 	jnz num_conv
-
-mem_printDebug_num_conv_end:
-	
-	push 32 ;space
-	push 120 ;x
-	push 101 ;e
-	push 100 ;d
-	push 110 ;n
-	push 105 ;i
-	call print
-
-	pop eax
-	pop ebx
-	pop edx
-	pop esi
-	pop ecx
-	push edi
+num_to_text_end:
+	push esi
 	ret
-	
 
 mem_endLoop:
 	push eax
