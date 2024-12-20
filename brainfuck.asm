@@ -10,17 +10,17 @@ global mem_endLoop
 section .data
 	bfmem: times 30000 db 0
 	input: db 0
+	output: db 0
 
 section .text
 main:
 	push esi
 	mov esi, bfmem
-	
-	push esi
+
+	push 10
 	push 99
-	mov ecx, 1
+	mov ecx, 2
 	call print
-	add esp, 4
 
 	pop esi
 	mov eax, 0
@@ -89,32 +89,38 @@ getchar:
 	pop ebx
 	pop ecx
 	ret
-	
 
 print:
 	;;prints stack values to stdout using my putchar
 	;;uses ecx for string length
-	pop eax
+	;;ebx holds return address
+	;;it also prints in reverse
+	pop ebx
+print_loop:
 	cmp ecx, 0
-	jne print_do
-	ret
-print_do:
+	je print_end
+	pop eax
 	call putchar
-	add ecx, -1
-	jmp $-6
+	sub ecx, 1
+	jmp print_loop
+print_end:
+	push ebx
+	ret
 
 putchar:
 	;;prints eax to stdout
 	;;this is my own rendition of putchar btw
 	;;comiler explorer just does extern call putchar
-	push eax
-	mov eax, 4
-	pop ecx
+	mov [output], al
+	push ebx
+	push ecx
 	push edx
+	mov eax, 4
+	lea ecx, output
 	mov ebx, 1
 	mov edx, 1
 	int 0x80
-	pop ecx
 	pop edx
+	pop ecx
 	pop ebx
 	ret
