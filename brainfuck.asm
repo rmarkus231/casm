@@ -22,8 +22,8 @@ main:
 	push ebp
 	mov esi, bfmem
 	
-	mov eax, 7
-	call mem_move
+	mov eax, 10
+	call mem_add
 	call mem_printDebug
 
 	pop ebp
@@ -76,12 +76,24 @@ mem_printDebug:
 	call num_to_text
 	push 91 ;[
 	push 32
-	push 109
-	push 101
+	push 109 ;m
+	push 101 ;e
 	push 109
 	add ecx, 11
 	call print
+	;;text formating done here
+	;;memory dumping starts here
+	mov ecx, 0
+	push 10
+	.mem_dump:
+	mov eax, [esi + 1]
+	call num_to_text
+	push 32
+	cmp ecx, 9
+	jne .mem_dump
+	add ecx, 10
 
+	call print
 	
 
 	pop eax
@@ -98,16 +110,19 @@ num_to_text:
 	;;breks its decimal points down into chars
 	;;pushes them onto the stack
 	;;adds amount of char pushed to ecx
-	pop ebp ;;store return in esi
+	pop ebp ;;i dont do external func calls so i always know what ebp is and its pushed to stack at start of main
 
 	test eax, eax
 	jnz num_conv
-	mov edx, 48 ;;this is incase index is 0
-	push edx
+	nop
+	mov eax, 48 ;;this is incase value is 0
+	nop
+	push eax
 	add ecx, 1
-	jmp num_to_text_end
+	push ebp
+	ret
 
-	num_conv:
+num_conv:
 	mov edx, 0
 	mov ebx, 10
 	div ebx ;;remainder in edx, eax=eax/ebx
@@ -117,6 +132,7 @@ num_to_text:
 	test eax,eax
 	jnz num_conv
 num_to_text_end:
+	nop
 	push ebp
 	ret
 
