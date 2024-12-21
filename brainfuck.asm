@@ -19,12 +19,14 @@ section .text
 main:
 	mov dword [bfmem_start],bfmem
 	push esi
+	push ebp
 	mov esi, bfmem
 	
 	mov eax, 7
 	call mem_move
 	call mem_printDebug
 
+	pop ebp
 	pop esi
 	mov eax, 0
 	ret
@@ -39,10 +41,10 @@ mem_printDebug:
 
 	mov ecx, 0
 
-	sub esi, bfmem_start ;;find offset
-	nop
-	add esi, 30002 ;always offset 2 
 	mov eax, esi
+	sub eax, bfmem_start ;;find offset
+	nop
+	add eax, 30002 ;always offset 2 
 
 	push 32
 	call num_to_text	
@@ -55,7 +57,32 @@ mem_printDebug:
 	add ecx, 7
 	call print
 
-	;;debug index got, now the actual info
+	;;debug index got, now the frame size
+	mov ecx, 0
+	push 58 ;:
+	push 93 ;]
+	;;get index of +9
+	mov eax, esi
+	sub eax, bfmem_start
+	add eax, 30011
+	call num_to_text
+	push 32
+	push 46
+	push 46 ;.
+	push 32
+	mov eax, esi
+	sub eax, bfmem_start
+	add eax, 30002
+	call num_to_text
+	push 91 ;[
+	push 32
+	push 109
+	push 101
+	push 109
+	add ecx, 11
+	call print
+
+	
 
 	pop eax
 	pop ebx
@@ -71,7 +98,7 @@ num_to_text:
 	;;breks its decimal points down into chars
 	;;pushes them onto the stack
 	;;adds amount of char pushed to ecx
-	pop esi ;;store return in esi
+	pop ebp ;;store return in esi
 
 	test eax, eax
 	jnz num_conv
@@ -90,7 +117,7 @@ num_to_text:
 	test eax,eax
 	jnz num_conv
 num_to_text_end:
-	push esi
+	push ebp
 	ret
 
 mem_endLoop:
