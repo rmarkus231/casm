@@ -12,16 +12,21 @@ struct virt_mem{
 } vmem = { .sp=0, .in_loop=0};
 
 int mem_add(int i){
+	if(debug){printf("mem_add\n");}
 	vmem.mem[vmem.sp] += i;
 	return vmem.mem[vmem.sp];
 };
 
 int mem_move(int i){
+	if(debug){printf("mem_add\n");}
 	vmem.sp += i;
+	if(vmem.sp < 0){
+		vmem.sp = S - vmem.sp;
+	}
 	return vmem.sp;
 };
 
-inline int mem_get(void){if(debug){printf("mem_get\n");}return vmem.mem[vmem.sp];};
+inline char mem_get(void){if(debug){printf("mem_get\n");}return vmem.mem[vmem.sp];};
 
 int mem_set(char v){
 	if(debug){printf("mem_dec\n");}

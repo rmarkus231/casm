@@ -6,6 +6,8 @@
 #include <string.h>
 #include "instructions.h"
 
+
+
 enum instructions_e {
     BF_RIGHT      = '>',/* Liiguta mälu indeksit paremale. */
     BF_LEFT       = '<',/* Liiguta mälu indeksit vasakule. */
@@ -171,7 +173,6 @@ void print_instr(struct BF_instruction_st** inst_arr, int len){
 
 void run(struct BF_instruction_st** inst_arr, int len){
 	int i = 0;
-	int i2 = 0;
 	void (*run_instr)(struct BF_instruction_st*,int*);
 	int val = 0;
 	char c = 0;
@@ -185,37 +186,60 @@ void run(struct BF_instruction_st** inst_arr, int len){
 			//printf("%d,%c",val,c);
 		}else{
 			i++;
+
 		}
-		i2++;
 	}
 }
 
 void get_asm(char* prog){
 	int len = find_effective_len(prog);
 	struct BF_instruction_st** inst_arr = malloc(sizeof(struct BF_instruction_st*) * len + 1);
+	void (*inst_incl[10])() = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL}; //<>, +-, ',', '.', [, ], #, getchar, print, putchar
 	if(inst_arr == NULL){
-		printf("Out of memory, exiting");
+		printf(";;Out of memory, exiting");
 	}else{
 		parse(inst_arr, prog);
 		void (*asm_instr)(struct BF_instruction_st*,int*);
-
-		printf("global main\n"
-		"extern mem_add\n"
-		"extern mem_move\n"
-	        "extern mem_get\n"
-	        "extern mem_set\n"
-		"extern mem_endLoop\n"
-		"extern mem_startLoop\n"
-	        "extern mem_printDebug\n\n"
-	        "extern putchar\n\n");
-		printf("section .text\n");
-    		printf("main:\n");
+		asm_header();
 
 		for(int i = 0; i < len; i++){
 			asm_instr = inst_arr[i]->printASM;
 			asm_instr(inst_arr[i],&i);
+			//dont need to add functions for things that are not used :)
+			switch(inst_arr[i]->c){
+				case BF_INCREASE:
+					inst_incl[0] = asm_mem_add;
+					break;
+				case BF_RIGHT:
+					inst_incl[1] = asm_mem_move;
+					break;
+				case BF_READ:
+					inst_incl[2] = asm_mem_set;
+					inst_incl[7] = asm_getchar;
+					break;
+				case BF_PRINT:
+					inst_incl[3] = asm_mem_get;
+					inst_incl[9] = asm_putchar;
+					break;
+					inst_incl[4] = asm_mem_startLoop;
+					break;
+				case BF_END_LOOP:
+					inst_incl[5] = asm_mem_endLoop;
+					break;
+				case BF_DEBUG:
+					inst_incl[6] = asm_mem_printDebug;
+					inst_incl[8] = asm_print;
+					inst_incl[9] = asm_putchar;
+					break;
+			}
 		}
-        	printf("\tret\n");
+        	printf("\tpop ebp\n\tpop esi\n\tmov eax, 0\n\tret\n");
+		for(int i = 0; i < 10; i++){
+			if(inst_incl[i] == NULL){
+				continue;
+			}
+			inst_incl[i]();
+		}
 		cleanup(inst_arr,len);
 	}
 }
@@ -249,6 +273,7 @@ void interpret2(char* prog){
 		printf("Out of memory, exiting");
 	}else{
 		parse(inst_arr, prog);
+		print_instr(inst_arr,len);
 		run(inst_arr, len);
 		cleanup(inst_arr,len);
 	}

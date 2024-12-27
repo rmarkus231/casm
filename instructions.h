@@ -35,4 +35,14 @@ struct BF_instruction_st* BF_new_mem_set(void);
 struct BF_instruction_st* BF_new_mem_get(void);
 
 void asm_header(void);
+void asm_mem_printDebug(void);
+void asm_mem_endLoop(void);
+void asm_mem_startLoop(void);
+void asm_mem_get(void);
+void asm_mem_set(void);
+void asm_mem_add(void);
+void asm_mem_move(void);
+void asm_getchar(void);
+void asm_print(void);
+void asm_putchar(void);
 #endif

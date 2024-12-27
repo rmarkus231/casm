@@ -25,9 +25,11 @@ int main(int argc, char* argv[]){
 	}else if(!strcmp(argv[2],"1")){
 		interpret("++[>++[>---<-]<-]#");
 	}else if(!strcmp(argv[2],"2")){
-		interpret2("++[>++[>---<-]<-]#");
+		interpret2("++[>++[>--<-]<-]#");
 	}else if(!strcmp(argv[2],"asm")){
-		get_asm("++[>++[>---<-]<-]#");
+		//get_asm("++[>++[>---<-]<-]#");
+		get_asm("++#");
+
 	}
 	return 0;
 }
