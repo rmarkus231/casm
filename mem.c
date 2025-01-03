@@ -26,7 +26,7 @@ int mem_move(int i){
 	return vmem.sp;
 };
 
-inline char mem_get(void){if(debug){printf("mem_get\n");}return vmem.mem[vmem.sp];};
+inline unsigned char mem_get(void){if(debug){printf("mem_get\n");}return vmem.mem[vmem.sp];};
 
 int mem_set(char v){
 	if(debug){printf("mem_dec\n");}

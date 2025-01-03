@@ -20,7 +20,7 @@ gdb: $(EXEC)
 
 asm:
 	./$(EXEC) 1 asm > $(MAIN_ASM).asm
-	nasm $(MAIN_ASM).asm -felf
+	nasm -g $(MAIN_ASM).asm -felf
 	gcc -g -m32 $(MAIN_ASM).o -o brainfuck
 	rm $(MAIN_ASM).o
 	./$(MAIN_ASM)

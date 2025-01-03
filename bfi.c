@@ -194,7 +194,8 @@ void run(struct BF_instruction_st** inst_arr, int len){
 void get_asm(char* prog){
 	int len = find_effective_len(prog);
 	struct BF_instruction_st** inst_arr = malloc(sizeof(struct BF_instruction_st*) * len + 1);
-	void (*inst_incl[10])() = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL}; //<>, +-, ',', '.', [, ], #, getchar, print, putchar
+	void (*inst_incl[8])() = {NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL}; 
+	//>:0, +:1, ,:2, .:3, #:4, getc:5, print:6, putchar:7
 	if(inst_arr == NULL){
 		printf(";;Out of memory, exiting");
 	}else{
@@ -215,26 +216,21 @@ void get_asm(char* prog){
 					break;
 				case BF_READ:
 					inst_incl[2] = asm_mem_set;
-					inst_incl[7] = asm_getchar;
+					inst_incl[5] = asm_getchar;
 					break;
 				case BF_PRINT:
 					inst_incl[3] = asm_mem_get;
-					inst_incl[9] = asm_putchar;
-					break;
-					inst_incl[4] = asm_mem_startLoop;
-					break;
-				case BF_END_LOOP:
-					inst_incl[5] = asm_mem_endLoop;
+					inst_incl[7] = asm_putchar;
 					break;
 				case BF_DEBUG:
-					inst_incl[6] = asm_mem_printDebug;
-					inst_incl[8] = asm_print;
-					inst_incl[9] = asm_putchar;
+					inst_incl[4] = asm_mem_printDebug;
+					inst_incl[6] = asm_print;
+					inst_incl[7] = asm_putchar;
 					break;
 			}
 		}
         	printf("\tpop ebp\n\tpop esi\n\tmov eax, 0\n\tret\n");
-		for(int i = 0; i < 10; i++){
+		for(int i = 0; i < 8; i++){
 			if(inst_incl[i] == NULL){
 				continue;
 			}

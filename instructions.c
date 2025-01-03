@@ -24,9 +24,9 @@ void BF_increment_run(struct BF_instruction_st* instr, int* mem_adr){
 }
 
 void BF_increment_ASM(struct BF_instruction_st* instr, int* mem_adr){
-	printf("\t;;instr: %c x %d\n",instr->c,instr->value);
-	printf("\tmov eax, %d\n",instr->value);
-	printf("\tcall mem_add\n");
+	printf("\t;;instr: %c x %d\n"
+	"\tmov eax, %d\n"
+	"\tcall mem_add\n",instr->c,instr->value,instr->value);
 }
 
 struct BF_instruction_st* BF_new_increment(int val){
@@ -40,9 +40,9 @@ void BF_move_run(struct BF_instruction_st* instr, int* mem_adr){
 
 
 void BF_move_ASM(struct BF_instruction_st* instr, int* mem_adr){
-	printf("\t;;instr: %c x %d\n",instr->c,instr->value);
-	printf("\tmov eax, %d\n",instr->value);
-	printf("\tcall mem_move\n");
+	printf("\t;;instr: %c x %d\n"
+	"\tmov eax, %d\n"
+	"\tcall mem_move\n",instr->c,instr->value,instr->value);
 	
 }
 
@@ -60,8 +60,10 @@ void BF_begin_loop_run(struct BF_instruction_st* instr, int* mem_adr){
 }
 
 void BF_begin_loop_ASM(struct BF_instruction_st* instr, int* mem_adr){
-	printf("\t;;instr: %c\n",instr->c);
-	printf("\tcall mem_startLoop\n");
+	printf("\t;;instr: %c\n"
+	"\tcmp byte [esi], 0\n"
+	"\tje .end_loop_%d\n"
+	"\t.begin_loop_%d:\n",instr->c,instr->value,instr->value);
 }
 
 struct BF_instruction_st* BF_new_begin_loop(){
@@ -78,8 +80,10 @@ void BF_end_loop_run(struct BF_instruction_st* instr, int* mem_adr){
 }
 
 void BF_end_loop_ASM(struct BF_instruction_st* instr, int* mem_adr){
-	printf("\t;;instr: %c\n",instr->c);
-	printf("\tcall mem_endLoop\n",instr->value);
+	printf("\t;;instr: %c\n"
+	"\tcmp byte [esi], 0\n"
+	"\tjne .begin_loop_%d\n"
+	"\t.end_loop_%d:\n",instr->c,instr->value,instr->value);
 }
 
 struct BF_instruction_st* BF_new_end_loop(int val){
@@ -92,8 +96,8 @@ void BF_mem_print_debug_run(struct BF_instruction_st* instr, int* mem_adr){
 }
 
 void BF_mem_print_debug_ASM(struct BF_instruction_st* instr, int* mem_adr){
-	printf("\t;;instr: %c\n",instr->c);
-	printf("\tcall mem_printDebug\n");
+	printf("\t;;instr: %c\n"
+	"\tcall mem_printDebug\n",instr->c);
 }
 
 struct BF_instruction_st* BF_new_print_debug(){
@@ -114,8 +118,8 @@ void BF_mem_set_run(struct BF_instruction_st* instr, int* mem_adr){
 
 
 void BF_mem_set_ASM(struct BF_instruction_st* instr, int* mem_adr){
-	printf("\t;;instr: %c\n",instr->c);
-	printf("\tcall mem_set\n");
+	printf("\t;;instr: %c\n"
+	"\tcall mem_set\n",instr->c);
 }
 
 struct BF_instruction_st* BF_new_mem_set(void){
@@ -129,8 +133,8 @@ void BF_mem_get_run(struct BF_instruction_st* instr, int* mem_adr){
 }
 
 void BF_mem_get_ASM(struct BF_instruction_st* instr, int* mem_adr){
-	printf("\t;;instr: %c\n",instr->c);
-	printf("\tcall mem_get\n");
+	printf("\t;;instr: %c\n"
+	"\tcall mem_get\n",instr->c);
 }
 
 struct BF_instruction_st* BF_new_mem_get(void){
@@ -139,7 +143,7 @@ struct BF_instruction_st* BF_new_mem_get(void){
 
 void asm_header(void){
 	printf("global main\nsection .data\n"
-	"\t bfmem: times 30000 db 0\n"
+	"\tbfmem: times 30000 db 0\n"
 	"\tinput: db 0\n\toutput: db 0\n"
 	"\tbfmem_start: dd 0\n"
 	"\nsection .text\n"
@@ -198,35 +202,36 @@ void asm_mem_printDebug(void){
 	"\t;;text formating done here\n"
 	"\t;;memory dumping starts here\n"
 	"\tmov ecx, 0\n"
+	"\tmov eax, 0\n"
 	"\tpush 10\n"
-	"\tmov eax, [esi + 9]\n"
+	"\tmov al, [esi + 9]\n"
 	"\tcall num_to_text\n"
 	"\tpush 32\n"
-	"\tmov eax, [esi + 8]\n"
+	"\tmov al, [esi + 8]\n"
 	"\tcall num_to_text\n"
 	"\tpush 32\n"
-	"\tmov eax, [esi + 7]\n"
+	"\tmov al, [esi + 7]\n"
 	"\tcall num_to_text\n"
 	"\tpush 32\n"
-	"\tmov eax, [esi + 6]\n"
+	"\tmov al, [esi + 6]\n"
 	"\tcall num_to_text\n"
 	"\tpush 32\n"
-	"\tmov eax, [esi + 5]\n"
+	"\tmov al, [esi + 5]\n"
 	"\tcall num_to_text\n"
 	"\tpush 32\n"
-	"\tmov eax, [esi + 4]\n"
+	"\tmov al, [esi + 4]\n"
 	"\tcall num_to_text\n"
 	"\tpush 32\n"
-	"\tmov eax, [esi + 3]\n"
+	"\tmov al, [esi + 3]\n"
 	"\tcall num_to_text\n"
 	"\tpush 32\n"
-	"\tmov eax, [esi + 2]\n"
+	"\tmov al, [esi + 2]\n"
 	"\tcall num_to_text\n"
 	"\tpush 32\n"
-	"\tmov eax, [esi + 1]\n"
+	"\tmov al, [esi + 1]\n"
 	"\tcall num_to_text\n"
 	"\tpush 32\n"
-	"\tmov eax, [esi]\n"
+	"\tmov al, [esi]\n"
 	"\tcall num_to_text\n"
 	"\tpush 32\n"
 	"\tadd ecx, 11\n"
@@ -259,28 +264,6 @@ void asm_mem_printDebug(void){
 	"\tret\n");
 }
 
-void asm_mem_endLoop(void){
-	printf("mem_endLoop:\n"
-	"\tpush eax\n"
-	"\txor eax, eax\n"
-	"\tmov eax, esi\n"
-	"\t;;i chanced stack addressed to be relative\n"
-	"\tsub eax, [esi]\n"
-	"\tcmp word [eax],0\n"
-	"\tjne .mem_endLoop_do\n"
-	"\tpop eax\n"
-	"\tret\n"
-	"\t.mem_endLoop_do:\n"
-	"\tsub esi, [esi]\n"
-	"\tpop eax\n"
-	"\tret\n");
-}
-
-void asm_mem_startLoop(void){
-	printf("mem_startLoop:\n"
-	"\tret\n");
-}
-
 void asm_mem_get(void){
 	printf("mem_get:\n"
 	"\tpush eax\n"
@@ -293,7 +276,7 @@ void asm_mem_get(void){
 void asm_mem_set(void){
 	printf("mem_set:\n"
 	"\tcall getchar\n"
-	"\tmov word [esi],input\n"
+	"\tmov byte [esi],input\n"
 	"\tret\n");
 }
 
@@ -301,22 +284,27 @@ void asm_mem_add(void){
 	printf("mem_add:\n"
 	"\t;;adds eax to current esi value\n"
 	"\tpush ebx\n"
-	"\tmov ebx, [esi]\n"
-	"\tadd ebx, eax\n"
-	"\tmov [esi], ebx\n"
+	"\tmov al, [esi]\n"
+	"\tadd bl, al\n"
+	"\tmov [esi], bl\n"
 	"\tpop ebx\n"
 	"\tret\n");
 }
 
 void asm_mem_move(void){
 	printf("mem_move:\n"
-	"\t;;moves sp by eax\n"
+	"\t;;moves esi by eax\n"
+	"\tpush ebx\n"
 	"\tadd esi, eax\n"
-	"\tcmp esi, [bfmem_start+30002]\n"
+	"\tmov ebx, [bfmem_start]\n"
+	"\tadd ebx, 30002\n"
+	"\tcmp esi, ebx\n"
 	"\tjge .mem_move_oob\n"
+	"\tpop ebx\n"
 	"\tret\n"
 	"\t.mem_move_oob:\n"
 	"\tsub esi, 30002\n"
+	"\tpop ebx\n"
 	"\tret\n");
 }
 
