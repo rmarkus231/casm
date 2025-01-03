@@ -24,8 +24,3 @@ asm:
 	gcc -g -m32 $(MAIN_ASM).o -o brainfuck
 	rm $(MAIN_ASM).o
 	./$(MAIN_ASM)
-
-asm2:
-	nasm -g $(MAIN_ASM_temp).asm -felf
-	gcc -g -m32 $(MAIN_ASM_temp).o -o brainfuck
-	./brainfuck
