@@ -1,6 +1,5 @@
 MAIN := main.c bfi.c mem.c stack.c instructions.c
 MAIN_ASM := brainfuck
-MAIN_ASM_temp := template_brainfuck
 EXEC := main
 CXX := gcc
 CXXFLAGS := -g -std=c11
