@@ -12,7 +12,7 @@
 
 
 ## building asm from files
-- to build the asm of "test.txt" run "make asm"
+- to build the asm of "test.txt" run "make asm", this will build a file called brainfuck using test.txt
 - to build asm of custom brainfuck files do "./main filename asm", this will print the asm to console
 - to put the generated asm into a file do "./main filename asm > out.asm" where out.asm is the file you can compile with the asm32 compiler of your choice 
 -  you can always change the makefile to use a different file with "make asm"
