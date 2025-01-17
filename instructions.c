@@ -25,7 +25,7 @@ void BF_increment_run(struct BF_instruction_st* instr, int* mem_adr){
 
 void BF_increment_ASM(struct BF_instruction_st* instr, int* mem_adr){
 	printf("\t;;instr: %c x %d\n"
-	"\tmov eax, %d\n"
+	"\tmov al, %d\n"
 	"\tcall mem_add\n",instr->c,instr->value,instr->value);
 }
 
@@ -63,7 +63,7 @@ void BF_begin_loop_ASM(struct BF_instruction_st* instr, int* mem_adr){
 	printf("\t;;instr: %c\n"
 	"\tcmp byte [esi], 0\n"
 	"\tje .end_loop_%d\n"
-	"\t.begin_loop_%d:\n",instr->c,instr->value,instr->value);
+	"\t.begin_loop_%d:\n",instr->c,*mem_adr,*mem_adr);
 }
 
 struct BF_instruction_st* BF_new_begin_loop(){
@@ -83,7 +83,7 @@ void BF_end_loop_ASM(struct BF_instruction_st* instr, int* mem_adr){
 	printf("\t;;instr: %c\n"
 	"\tcmp byte [esi], 0\n"
 	"\tjne .begin_loop_%d\n"
-	"\t.end_loop_%d:\n",instr->c,instr->value,instr->value);
+	"\t.end_loop_%d:\n",instr->c,*mem_adr,*mem_adr);
 }
 
 struct BF_instruction_st* BF_new_end_loop(int val){
@@ -128,7 +128,7 @@ struct BF_instruction_st* BF_new_mem_set(void){
 
 void BF_mem_get_run(struct BF_instruction_st* instr, int* mem_adr){
 	instr->value = mem_get();
-	printf("%d",instr->value);
+	printf("%c",instr->value);
 	++(*mem_adr);
 }
 
@@ -267,7 +267,7 @@ void asm_mem_printDebug(void){
 void asm_mem_get(void){
 	printf("mem_get:\n"
 	"\tpush eax\n"
-	"\tmov eax, [esi]\n"
+	"\tmov al, [esi]\n"
 	"\tcall putchar\n"
 	"\tpop eax\n"
 	"\tret\n");
@@ -284,7 +284,7 @@ void asm_mem_add(void){
 	printf("mem_add:\n"
 	"\t;;adds eax to current esi value\n"
 	"\tpush ebx\n"
-	"\tmov al, [esi]\n"
+	"\tmov bl, [esi]\n"
 	"\tadd bl, al\n"
 	"\tmov [esi], bl\n"
 	"\tpop ebx\n"

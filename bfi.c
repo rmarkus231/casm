@@ -164,10 +164,13 @@ void parse(struct BF_instruction_st** inst_arr, char* prog){
 void print_instr(struct BF_instruction_st** inst_arr, int len){
 	int val;
 	char c;
+	printf("len: %d",len);
 	for(int i = 0; i < len; i++){
-		val = inst_arr[i]->value;
-		c = inst_arr[i]->c;
-		printf("%c:%d\n",c,val);
+		if(inst_arr[i] != NULL){
+			val = inst_arr[i]->value;
+			c = inst_arr[i]->c;
+			printf("%c:%d\n",c,val);
+		}
 	}
 }
 
@@ -202,31 +205,45 @@ void get_asm(char* prog){
 		parse(inst_arr, prog);
 		void (*asm_instr)(struct BF_instruction_st*,int*);
 		asm_header();
+		struct stack_st STACK= {.len=0,.size=0,.arr=NULL};
+		int loop_index = 0;
+		//using stack to store the indexes for naming jumps for loops in asm
 
 		for(int i = 0; i < len; i++){
-			asm_instr = inst_arr[i]->printASM;
-			asm_instr(inst_arr[i],&i);
-			//dont need to add functions for things that are not used :)
-			switch(inst_arr[i]->c){
-				case BF_INCREASE:
-					inst_incl[0] = asm_mem_add;
-					break;
-				case BF_RIGHT:
-					inst_incl[1] = asm_mem_move;
-					break;
-				case BF_READ:
-					inst_incl[2] = asm_mem_set;
-					inst_incl[5] = asm_getchar;
-					break;
-				case BF_PRINT:
-					inst_incl[3] = asm_mem_get;
-					inst_incl[7] = asm_putchar;
-					break;
-				case BF_DEBUG:
-					inst_incl[4] = asm_mem_printDebug;
-					inst_incl[6] = asm_print;
-					inst_incl[7] = asm_putchar;
-					break;
+			if(inst_arr[i] != NULL){
+				asm_instr = inst_arr[i]->printASM;
+				//dont need to add functions for things that are not used :)
+				switch(inst_arr[i]->c){
+					case BF_INCREASE:
+						inst_incl[0] = asm_mem_add;
+						break;
+					case BF_RIGHT:
+						inst_incl[1] = asm_mem_move;
+						break;
+					case BF_READ:
+						inst_incl[2] = asm_mem_set;
+						inst_incl[5] = asm_getchar;
+						break;
+					case BF_PRINT:
+						inst_incl[3] = asm_mem_get;
+						inst_incl[7] = asm_putchar;
+						break;
+					case BF_DEBUG:
+						inst_incl[4] = asm_mem_printDebug;
+						inst_incl[6] = asm_print;
+						inst_incl[7] = asm_putchar;
+						break;
+				}
+				if(inst_arr[i]->c == BF_END_LOOP){
+					int temp = stack_pop(&STACK);
+					asm_instr(inst_arr[i],&temp);
+				}else if(inst_arr[i]->c == BF_START_LOOP){
+					stack_push(&STACK,loop_index);
+					asm_instr(inst_arr[i],&loop_index);
+					loop_index += 1;
+				}else{
+					asm_instr(inst_arr[i],&i);
+				}
 			}
 		}
         	printf("\tpop ebp\n\tpop esi\n\tmov eax, 0\n\tret\n");
@@ -269,7 +286,8 @@ void interpret2(char* prog){
 		printf("Out of memory, exiting");
 	}else{
 		parse(inst_arr, prog);
-		print_instr(inst_arr,len);
+		//toggle to see debug info about characters
+		//print_instr(inst_arr,len);
 		run(inst_arr, len);
 		cleanup(inst_arr,len);
 	}
