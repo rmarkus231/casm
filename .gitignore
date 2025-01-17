@@ -52,4 +52,6 @@ Mkfile.old
 dkms.conf
 # asm files
 brainfuck.asm
+brainfuck
+main
 *template*
